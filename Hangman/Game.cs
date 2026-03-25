@@ -13,19 +13,14 @@ namespace Hangman
 
         private char[] GuessList = new char[26]; //hold an array of guesses to look through
         public int GuessCount { get; private set; }
-
         public int RemaingWrongGuesses { get; private set; }
-
-
-        //guess validation
-        //win loss detection
-        //the word
 
         public Game(string secretWord, Player player)
         {
             SecretWord = secretWord; //get the secret word
             IsRunning = true; //start the game running
             GuessCount = 0;
+            RemaingWrongGuesses = 6;
         }
 
         public string ProcessGuess(char input)
@@ -54,7 +49,8 @@ namespace Hangman
                 }
             }
             //Add guess to GuessList
-            return $"You have not found a letter";
+            RemaingWrongGuesses--; //remove a wrong guess
+            return $"The letter {input} is not in the word.";
         }
      
         public void DisplayMaskedWord()
@@ -88,17 +84,28 @@ namespace Hangman
             char input;
             while (IsRunning == true)
             {
-                DisplayMaskedWord();
+                DisplayMaskedWord(); 
+                DisplayScore();
                 do Console.WriteLine("\nWhat letter would you like to guess");
                 while (!char.TryParse(Console.ReadLine(), out input));
                 input = char.ToLower(input);
-                ProcessGuess(input);
+                Console.WriteLine(ProcessGuess(input));
+                if (RemaingWrongGuesses == 0)
+                {
+                    IsRunning = false;
+                    Console.WriteLine($"You are out of guesses, the word was {SecretWord} you lose.");
+                }
                 if (CheckWinCondition() == true)
                 {
                     IsRunning = false;
-                    Console.WriteLine("You have won!");
+                    Console.WriteLine($"You have won! The word was {SecretWord}.");
                 }
             }
+        }
+
+        private void DisplayScore()
+        {
+            Console.Write($"Wrong guesses left [{RemaingWrongGuesses}]");
         }
 
         public bool CheckWinCondition()
@@ -123,10 +130,5 @@ namespace Hangman
                 return false;
             }
         }
-
-        //ProcessGuess
-        //IsWordSolved
-        //GetMaskedWord
-        //HasAlreadyGuessed
     }
 }

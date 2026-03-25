@@ -18,7 +18,7 @@
             string playerName = Console.ReadLine() ?? "";
             Player player = new(playerName);
             
-            Game game = new Game("bird", player); //need to also add players
+            Game game = new Game("process", player); //need to also add players
             game.Turn();
                         
         }
