@@ -8,15 +8,15 @@ namespace Hangman
     internal class Game
     {
         public bool IsRunning { get; set; }
-        //game state
         public string SecretWord { get; private set; } //hold the secret word
 
         private char[] GuessList = new char[26]; //hold an array of guesses to look through
         public int GuessCount { get; private set; }
         public int RemaingWrongGuesses { get; private set; }
-
+        public Player Player { get; private set; }
         public Game(string secretWord, Player player)
         {
+            Player = player;
             SecretWord = secretWord; //get the secret word
             IsRunning = true; //start the game running
             GuessCount = 0;
@@ -25,9 +25,6 @@ namespace Hangman
 
         public string ProcessGuess(char input)
         {
-            //look at GuessList for previous guess
-            //if guessed before
-            
             for (int i = 0; i < GuessCount; i++)
             {
                 if (GuessList[i] == input)  //go through the array
@@ -44,11 +41,9 @@ namespace Hangman
             {
                 if (input == s)
                 {
-                    //GuessList[].Add(input);
                     return $"You have found a letter {input}";
                 }
             }
-            //Add guess to GuessList
             RemaingWrongGuesses--; //remove a wrong guess
             return $"The letter {input} is not in the word.";
         }
@@ -64,7 +59,7 @@ namespace Hangman
                     if (GuessList[i] == c)
                     {
                         wasGuessed = true;
-                        break;
+                        break;  //break out of the for loop, back to the foreach loop
                     }
                 }
 
@@ -81,24 +76,25 @@ namespace Hangman
 
         public void Turn()
         {
+            
             char input;
             while (IsRunning == true)
             {
                 DisplayMaskedWord(); 
                 DisplayScore();
-                do Console.WriteLine("\nWhat letter would you like to guess");
+                do Console.WriteLine("\nWhat letter would you like to guess? ");
                 while (!char.TryParse(Console.ReadLine(), out input));
                 input = char.ToLower(input);
                 Console.WriteLine(ProcessGuess(input));
                 if (RemaingWrongGuesses == 0)
                 {
                     IsRunning = false;
-                    Console.WriteLine($"You are out of guesses, the word was {SecretWord} you lose.");
+                    Console.WriteLine($"You are out of guesses {Player.Name}, the word was {SecretWord} you lose.");
                 }
                 if (CheckWinCondition() == true)
                 {
                     IsRunning = false;
-                    Console.WriteLine($"You have won! The word was {SecretWord}.");
+                    Console.WriteLine($"{Player.Name}, you have won! The word was {SecretWord}.");
                 }
             }
         }
@@ -108,27 +104,27 @@ namespace Hangman
             Console.Write($"Wrong guesses left [{RemaingWrongGuesses}]");
         }
 
-        public bool CheckWinCondition()
+        public bool CheckWinCondition()  //now it asks the exact rule of hangman, did every secret letter have at least one match
         {
-            int flags = 0;
-            foreach (char c in SecretWord)  //go through each character in Secret Word
+            foreach (char c in SecretWord)
             {
+                bool wasGuessed = false;
+
                 for (int i = 0; i < GuessCount; i++)
                 {
                     if (GuessList[i] == c)
                     {
-                        flags++;  //add a flag for each matching letter 
+                        wasGuessed = true;
+                        break; //break out of the for loop, back to the foreach loop
                     }
-                }   
+                }
+
+                if (!wasGuessed)
+                {
+                    return false;
+                }
             }
-            if (flags == SecretWord.Length)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
     }
 }
