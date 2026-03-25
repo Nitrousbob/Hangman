@@ -13,7 +13,15 @@
 
 
             Console.Title = "Hangman";
-            Console.WriteLine("Hello, World!");
+
+            for (int i = 0; i < 2; i++)  //create 2 players
+            {
+                Console.WriteLine($"Hello Player {i+1}, What is your name? ");
+                string playerName = Console.ReadLine();
+                Player player = new(playerName);
+            }
+
+            Console.WriteLine("Welcome Players.");
 
         }
     }
